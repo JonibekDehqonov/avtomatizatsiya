@@ -221,8 +221,7 @@
             // Update Product
             $('#editeProduct').on('click', function() {
                 let id = $('#product_id').val();
-                let formData = new FormData(); // Fayllar uchun FormData ishlatamiz
-
+                let formData = new FormData(); // Fayllar uchun FormData ishlatami
                 formData.append('_method', 'PUT'); // Laravel PATCH yoki PUT uchun
                 formData.append('name', $('#edit_name').val());
                 formData.append('price', $('#edit_price').val());

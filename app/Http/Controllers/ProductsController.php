@@ -82,8 +82,6 @@ class ProductsController extends Controller
      */
         public function edit($id)
         {
-            
-
             $product = Products::findOrFail($id);
             return response()->json($product);
         }
@@ -101,7 +99,7 @@ class ProductsController extends Controller
                 Storage::disk('public')->delete($product->image);
             }
     
-            $fileName = time().'_'.$request->file('image')->getClientOriginalName();
+            $fileName = $request->file('image')->getClientOriginalName();
             $filePath = $request->file('image')->storeAs('products', $fileName, 'public');             
             $data['image'] = $filePath;
         }

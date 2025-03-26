@@ -39,7 +39,7 @@
 {{--Modal stars  --}}
 <div class="modal fade" id="modalShow" tabindex="-1">
     <div class="modal-dialog ">
-        <div class="modal-content close">
+        <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Product Form</h5>
                 <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>

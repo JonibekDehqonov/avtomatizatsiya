@@ -29,4 +29,5 @@ Route::resource('orders', OrderController::class)->middleware('auth');
 Route::get('SelectProductOrders',[OrderController::class, 'SelectProductOrders'])->name('SelectProductOrders');
 
 
-Route::resource('category',CategoryController::class);
+Route::resource('category',CategoryController::class)->middleware('auth');
+Route::get('catrgory-data', [CategoryController::class, 'getCategory'])->name('catrgory-data')->middleware('auth');

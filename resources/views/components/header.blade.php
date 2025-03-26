@@ -261,6 +261,11 @@
                         <i class="bi bi-circle"></i><span>Select Product Order </span>
                     </a>
                 </li>
+                <li class="inClickOrders">
+                    <a href="{{ route('category.index') }}">
+                        <i class="bi bi-circle"></i><span>Category</span>
+                    </a>
+                </li>
 
             </ul>
         </li><!-- End Components Nav -->
