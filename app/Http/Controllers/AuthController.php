@@ -32,9 +32,10 @@ class AuthController extends Controller
 
     if ($validator->fails()){
         return response()->json([
-                "status" => false,
-                "errors" => $validator->errors()
-            ]);
+            'success' => false,
+            'message' =>'invalid email or password',
+            'errors' => $validator->errors()
+        ], 422);
     } else {
         if (Auth::attempt($request->only(["email", "password"]))) {
             return response()->json([
@@ -45,7 +46,7 @@ class AuthController extends Controller
         } else {
             return response()->json([
                 "status" => false,
-                "errors" => ["Invalid credentials"]
+                "errors" =>["error email or password"],
             ]);
         }
     }    }
@@ -53,7 +54,7 @@ class AuthController extends Controller
     public function postRegistor(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:4'
 
@@ -61,9 +62,11 @@ class AuthController extends Controller
 
         if ($validator->fails()){
             return response()->json([
-                    "status" => false,
-                    "errors" => $validator->errors()
-                ]);
+                'success' => false,
+                'message' => 'error email or password',
+                'errors' => $validator->errors()
+            ]);
+            
         }
 
         $data = $request->all();

@@ -29,7 +29,7 @@
                             </thead>
                             <tbody></tbody>
                         </table>
-         </main>
+    </main>
 
     <!-- Modal Start  create-->
     <!-- Modal Start - Create -->
@@ -41,7 +41,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="productForm">
+                    <form enctype="multipart/form-data" id="productForm">
                         <meta name="csrf-token" content="{{ csrf_token() }}">
                         <div class="form-group">
                             <label for="name">Name</label>
@@ -59,18 +59,19 @@
                         <div class="form-group">
                             <label for="stock">Category</label>
                             <select class="form-select category_id" id="category_select" name="category_id">
-                            <option></option>
-                            @foreach ($categorys as $category)
-                                <option id="category" value="{{ $category->id }}" data-name="{{ $category->name_category }}"data-id="{{ $category->id }}">
-                                    {{ $category->name_category }}
-                                </option>
-                            @endforeach
+                                <option></option>
+                                @foreach ($categorys as $category)
+                                    <option id="category" value="{{ $category->id }}"
+                                        data-name="{{ $category->name_category }}"data-id="{{ $category->id }}">
+                                        {{ $category->name_category }}
+                                    </option>
+                                @endforeach
                             </select>
-                         
+
                         </div>
                         <div class="form-group">
                             <label for="pimage" class="form-label">Изображение</label>
-                            <input class="form-control"  type="file" id="image"  name="image">
+                            <input class="form-control" type="file" id="image" name="image">
                         </div>
                     </form>
                 </div>
@@ -90,7 +91,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editeForm">
+                    <form enctype="multipart/form-data" id="editeForm">
                         <meta name="csrf-token" content="{{ csrf_token() }}">
                         <input type="hidden" id="product_id" name="product_id">
                         <div class="form-group">
@@ -109,23 +110,42 @@
                         <div class="form-group">
                             <label for="stock">Category</label>
                             <select class="form-select category_id" id="category_update" name="category_id">
-                            <option></option>
-                            @foreach ($categorys as $category)
-                                <option id="category" value="{{ $category->id }}" data-name="{{ $category->name_category }}"data-id="{{ $category->id }}">
-                                    {{ $category->name_category }}
-                                </option>
-                            @endforeach
+                                <option></option>
+                                @foreach ($categorys as $category)
+                                    <option id="category" value="{{ $category->id }}"
+                                        data-name="{{ $category->name_category }}"data-id="{{ $category->id }}">
+                                        {{ $category->name_category }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="pimage" class="form-label">Изображение</label>
-                            <input class="form-control"  type="file" id="edit_image" name="image">
+                            <input class="form-control" type="file" id="edit_image" name="image">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="editeProduct">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- error modal --}}
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Error!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="error-message"></p>
+                    <ul id="error-list"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -140,14 +160,15 @@
                 columns: [{
                         data: 'id'
                     },
-                    { 
+                    {
                         data: 'name',
                         render: function(data, type, row) {
-                            let imgSrc = row.image ? `${row.image}` : '/images/default.png'; // Agar rasm mavjud bo'lmasa, default rasm qo'yiladi
+                            let imgSrc = row.image ? `${row.image}` :
+                                '/images/default.png'; // Agar rasm mavjud bo'lmasa, default rasm qo'yiladi
                             return `<img src="${imgSrc}" width="30" height="30" style="border-radius: 50%; margin-right: 5px;"> ${data}`;
                         }
                     },
-                    
+
                     {
                         data: 'price'
                     },
@@ -178,30 +199,46 @@
                 // let category = $('#category_select').find(':selected').data('name');
                 // alert(category);
                 let formData = new FormData();
-                    formData.append('name', $('#name').val());
-                    formData.append('price', $('#price').val());
-                    formData.append('stock', $('#stock').val());
-                    formData.append('category_id', $('#category_select').val());
-                    formData.append('image', $('#image')[0].files[0]); // Faylni qo'shish
-                    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+                formData.append('name', $('#name').val());
+                formData.append('price', $('#price').val());
+                formData.append('stock', $('#stock').val());
+                formData.append('category_id', $('#category_select').val());
+                if ($('#image')[0].files[0]) {
+                    formData.append('image', $('#image')[0].files[0]);
+                } else {
+                    formData.append('image', null);
+                }
+                formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
 
 
                 $.ajax({
                     url: "{{ route('products.store') }}",
                     type: "POST",
                     data: formData,
-                    contentType: false,  
-                    processData: false,  
+                    contentType: false,
+                    processData: false,
                     success: function() {
                         $('#basicModal').modal('hide');
                         $('#productForm')[0].reset();
                         table.ajax.reload();
                     },
                     error: function(xhr, status, error) {
-                        console.log('Xatolik javobi:', xhr.responseText);
-                       console.log('Status:', status);
-                     console.log('Error:', error);
-    }
+                        let response = xhr
+                            .responseJSON;
+                        let errorMessage = response?.message || "Xatolik yuz berdi!";
+
+                        $("#error-message").text(errorMessage);
+                        $("#error-list").html("");
+
+                        if (response?.errors) {
+                            $.each(response.errors, function(key, val) {
+                                $("#error-list").append("<li class='text-danger'>" +
+                                    val + "</li>");
+                            });
+                        }
+
+                        $("#errorModal").modal("show")
+                    }
                 });
             });
 
@@ -232,12 +269,12 @@
                 let image = $('#edit_image')[0].files[0];
                 if (image) {
                     formData.append('image', image);
-                     }
+                }
                 $.ajax({
                     url: `/products/${id}`,
                     type: "POST",
                     data: formData,
-                    contentType: false,  
+                    contentType: false,
                     processData: false,
                     success: function() {
                         // console.log(data);
@@ -245,8 +282,22 @@
                         $('#editeForm')[0].reset();
                         table.ajax.reload();
                     },
-                    error: function() {
-                        alert('Error occurred');
+                    error: function(xhr, status, error) {
+                        let response = xhr
+                            .responseJSON;
+                        let errorMessage = response?.message || "Xatolik yuz berdi!";
+
+                        $("#error-message").text(errorMessage);
+                        $("#error-list").html("");
+
+                        if (response?.errors) {
+                            $.each(response.errors, function(key, val) {
+                                $("#error-list").append("<li class='text-danger'>" +
+                                    val + "</li>");
+                            });
+                        }
+
+                        $("#errorModal").modal("show")
                     }
                 });
             });

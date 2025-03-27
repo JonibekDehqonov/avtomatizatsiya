@@ -22,8 +22,7 @@
                                         <p class="text-center small">Enter your personal details to create account</p>
                                     </div>
 
-                                    <form class="row g-3 needs-validation" id="handleAjax"
-                                        method="POST" >
+                                    <form class="row g-3 needs-validation" id="handleAjax" method="POST">
                                         <meta name="csrf-token" content="{{ csrf_token() }}">
 
                                         <div class="col-12">
@@ -37,6 +36,7 @@
                                             <label for="yourEmail" class="form-label">Your Email</label>
                                             <input type="email" name="email" class="form-control" id="yourEmail"
                                                 required>
+                                            <div id="errors-list"></div>
                                             <div class="invalid-feedback">Please enter a valid Email adddress!</div>
                                         </div>
 
@@ -48,12 +48,12 @@
                                         </div>
 
                                         <div class="col-12">
-                                            <button class="btn btn-primary w-100"  type="submit">Create
+                                            <button class="btn btn-primary w-100" type="submit">Create
                                                 Account</button>
                                         </div>
                                         <div class="col-12">
-                                            <p class="small mb-0">Already have an account? <a
-                                                    href="#" id="ajaxLogin">Log in</a></p>
+                                            <p class="small mb-0">Already have an account? <a href="#"
+                                                    id="ajaxLogin">Log in</a></p>
                                         </div>
                                     </form>
 
@@ -66,7 +66,26 @@
                     </div>
                 </div>
 
-            </section>
+                <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="errorModalLabel">Error!</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="error-message"></p> 
+                            <ul id="error-list"></ul> 
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
         </div>
     </main>
@@ -84,24 +103,30 @@
                     if (response.status) {
                         window.location.href = response.redirect;
                     } else {
-                        $(".alert").remove();
-                        $.each(response.errors, function(key, val) {
-                            $("#errors-list").append("<div class='alert alert-danger'>" + val +
-                                "</div>");
+                        let errorMessage = response.message;
+                        $("#error-message").text(errorMessage); 
+                        $("#error-list").html(""); 
+                        if (response.errors) {
+                            $.each(response.errors, function(key, val) {
+                                $("#error-list").append("<li class='text-danger'>" + val +
+                                    "</li>");
                             });
                         }
 
+                        $("#errorModal").modal("show");
                     }
-                });
 
-                return false;
+                }
             });
 
-    $(document).ready(function () {
-        $("#ajaxLogin").click(function (e) {
-        e.preventDefault();
-        window.location.href = "{{ route('login') }}"; 
-    });
-    });
+            return false;
+        });
+
+        $(document).ready(function() {
+            $("#ajaxLogin").click(function(e) {
+                e.preventDefault();
+                window.location.href = "{{ route('login') }}";
+            });
+        });
     </script>
 </x-layouts.main>

@@ -15,12 +15,12 @@ class ProductsController extends Controller
     public function index()
     {
         $products = Products::all();
-        $category= Category::all();
+        $category = Category::all();
         // dd($products);
         return view('products.index')->with([
-        'products'=> $products,
-        'categorys'=>$category,
-         ]);
+            'products' => $products,
+            'categorys' => $category,
+        ]);
     }
     public function create()
     {
@@ -32,15 +32,15 @@ class ProductsController extends Controller
         if ($request->ajax()) {
 
             $data = Products::with('category');
-            
+
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('category', function ($row){
+                ->addColumn('category', function ($row) {
                     return $row->category->name_category ?? 'No Category';
                 })
                 ->addColumn('image', function ($row) {
-                    $imagePath =$row->image ? $row->image : 'default.png';
-                    return  'storage/'.$imagePath;
+                    $imagePath = $row->image ? $row->image : 'default.png';
+                    return  'storage/' . $imagePath;
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="btn-group">
@@ -63,15 +63,19 @@ class ProductsController extends Controller
 
     public function store(ProductsRequest $request)
     {
+        
         $validatedData = $request->validated();
 
         if ($request->hasFile('image')) {
             $name = $request->file('image')->getClientOriginalName();
             $filePath = $request->file('image')->storeAs('categories', $name, 'public');
             $validatedData['image'] = $filePath;
-        }
+        } else {
+            $validatedData['image'] = null;
 
-       $product= Products::create($validatedData);
+        }
+        
+        $product = Products::create($validatedData);
         return response()->json($product);
     }
 
@@ -80,17 +84,17 @@ class ProductsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-        public function edit($id)
-        {
-            $product = Products::findOrFail($id);
-            return response()->json($product);
-        }
+    public function edit($id)
+    {
+        $product = Products::findOrFail($id);
+        return response()->json($product);
+    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(ProductsRequest $request, Products $product)
-    {   
+    {
 
         $data = $request->validated();
 
@@ -98,12 +102,12 @@ class ProductsController extends Controller
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
-    
+
             $fileName = $request->file('image')->getClientOriginalName();
-            $filePath = $request->file('image')->storeAs('products', $fileName, 'public');             
+            $filePath = $request->file('image')->storeAs('products', $fileName, 'public');
             $data['image'] = $filePath;
         }
-    
+
         $product->update($data);
         return redirect()->route('products.index');
     }
